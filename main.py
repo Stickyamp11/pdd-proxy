@@ -164,7 +164,7 @@ def doSearch():
     #encoded_search_value = map_string(quote(search_value))
     print("This is a message to the console ------- 1 ", search_value)
     print("This is a message to the console session ------- 1.1 ", session_playdede)
-
+    return "222222"
     response = session_playdede.get(f"https://playdede.eu/search?s={search_value}")
     print("This is a message to the console ------ 2 ", response)
     return response.status_code
