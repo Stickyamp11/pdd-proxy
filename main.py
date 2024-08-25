@@ -75,6 +75,7 @@ DEFAULT_SEARCH_UI = '''
 
 app = Flask(__name__, static_folder='public')
 
+
 # URL of the login page
 login_url = 'https://playdede.eu/ajax.php'
 
@@ -85,13 +86,7 @@ payload = {
     '_method': "auth/login"
 }
 
-# Create a session object
-session_playdede = requests.Session()
-# Post the payload to the login page
-response = session_playdede.post(login_url, data=payload)
-print(f"session_playdede.post(login_url, data=payload): {response.status_code}")
-print(f"session_playdede.post(login_url, data=payload): {response.text}")
-print(f"session_playdede.post(login_url, data=payload): {response}")
+session_playdede = None
 
 
 @app.after_request
@@ -155,7 +150,6 @@ def login_page():
 @app.route('/doSearch', methods=['POST'])
 @requires_login
 def doSearch():
-    return str(session_playdede)
     search_value = request.form.get('searchValue')
     print("This is a message to the console, ", search_value)
 
@@ -168,13 +162,18 @@ def doSearch():
     print("This is a message to the console, ", search_value)
     
     response = session_playdede.get(f"https://playdede.eu/search?s={search_value}")
+    print("This is a message to the console response response response, ", response)
+
     # Fetch the profile page content
     content = response.text
+    print("contentcontentcontentcontent",content)
+
     # Parse HTML content with BeautifulSoup
     soup = BeautifulSoup(content, 'lxml')
+
     
     # Find the element with the class name 'importantElement'
-    important_element = soup.find(id='archive-content')
+    important_element = soup.find(id=' archive-content')
     
     # Extract the HTML of the important element
     if important_element:
@@ -331,4 +330,12 @@ def searchShow(serieTxt):
 
 
 if __name__ == '__main__':
+    print("Bootstrapping app")
+    # Create a session object
+    session_playdede = requests.Session()
+    # Post the payload to the login page
+    response = session_playdede.post(login_url, data=payload)
+    print(f"session_playdede.post(login_url, data=payload): {response.status_code}")
+    print(f"session_playdede.post(login_url, data=payload): {response.text}")
+    print(f"session_playdede.post(login_url, data=payload): {response}")
     app.run(debug=True)
