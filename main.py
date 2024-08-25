@@ -167,6 +167,7 @@ def doSearch():
 
     response = session_playdede.get(f"https://playdede.eu/search?s={search_value}")
     print("This is a message to the console ------ 2 ", response)
+    return response.status_code
 
     # Fetch the profile page content
     content = response.text
