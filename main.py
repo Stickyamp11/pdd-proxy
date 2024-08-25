@@ -1,3 +1,4 @@
+from functools import wraps
 from pipes import quote
 import re
 from bs4 import BeautifulSoup
@@ -90,6 +91,7 @@ session_playdede = requests.Session()
 session_playdede.post(login_url, data=payload)
 
 def requires_login(f):
+    @wraps(f)
     def wrapper_login(*args, **kwargs):
         # Check if session cookies are present
         cookies = request.cookies
