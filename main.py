@@ -109,6 +109,7 @@ def requires_login(f):
 @app.route('/')
 @requires_login
 def home():
+    initializeSession();
     return DEFAULT_SEARCH_UI;
 
 # Function to create a session with a dummy key and return the session cookie
@@ -160,7 +161,8 @@ def doSearch():
     # Encode the search_value to be URL-safe
     #encoded_search_value = map_string(quote(search_value))
     print("This is a message to the console ------- 1 ", search_value)
-    
+    print("This is a message to the console session ------- 1.1 ", session_playdede)
+
     response = session_playdede.get(f"https://playdede.eu/search?s={search_value}")
     print("This is a message to the console ------ 2 ", response)
 
@@ -329,14 +331,17 @@ def searchShow(serieTxt):
 
 #def selectMovieItem():
 
+def initializeSession():
+    print("initializing oooooooo")
+    if session_playdede is None:
+        print("Bootstrapping app")
+        # Create a session object
+        session_playdede = requests.Session()
+        # Post the payload to the login page
+        response = session_playdede.post(login_url, data=payload)
+        print(f"session_playdede.post(login_url, data=payload): {response.status_code}")
+        print(f"session_playdede.post(login_url, data=payload): {response.text}")
+        print(f"session_playdede.post(login_url, data=payload): {response}")
 
 if __name__ == '__main__':
-    print("Bootstrapping app")
-    # Create a session object
-    session_playdede = requests.Session()
-    # Post the payload to the login page
-    response = session_playdede.post(login_url, data=payload)
-    print(f"session_playdede.post(login_url, data=payload): {response.status_code}")
-    print(f"session_playdede.post(login_url, data=payload): {response.text}")
-    print(f"session_playdede.post(login_url, data=payload): {response}")
     app.run(debug=True)
