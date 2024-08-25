@@ -89,9 +89,9 @@ payload = {
 session_playdede = requests.Session()
 # Post the payload to the login page
 response = session_playdede.post(login_url, data=payload)
-app.logger.info(f"session_playdede.post(login_url, data=payload): {response.status_code}")
-app.logger.info(f"session_playdede.post(login_url, data=payload): {response.text}")
-app.logger.info(f"session_playdede.post(login_url, data=payload): {response}")
+print(f"session_playdede.post(login_url, data=payload): {response.status_code}")
+print(f"session_playdede.post(login_url, data=payload): {response.text}")
+print(f"session_playdede.post(login_url, data=payload): {response}")
 
 
 @app.after_request
