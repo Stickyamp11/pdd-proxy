@@ -151,6 +151,7 @@ def login_page():
 @app.route('/doSearch', methods=['POST'])
 @requires_login
 def doSearch():
+    global session_playdede
     search_value = request.form.get('searchValue')
     print("This is a message to the console, ", search_value)
 
@@ -194,6 +195,7 @@ def map_string(input_string):
 @app.route('/pelicula/<param>', methods=['GET'])
 @requires_login
 def getItem(param):
+    global session_playdede
     search_value = param
     print("This is a message to the console, ", search_value)
 
@@ -241,6 +243,7 @@ def getItem(param):
 @app.route('/episodios/<param>/', methods=['GET'])
 @requires_login
 def getShowEpisode(param):
+    global session_playdede
     search_value = param
     print("This is a message to the console, ", search_value)
 
@@ -288,6 +291,7 @@ def getShowEpisode(param):
 @app.route('/serie/<serieTxt>', methods=['GET'])
 @requires_login
 def searchShow(serieTxt):
+    global session_playdede
     search_value = serieTxt
     print("This is a message to the console, ", search_value)
 
@@ -332,6 +336,7 @@ def searchShow(serieTxt):
 #def selectMovieItem():
 
 def initializeSession():
+    global session_playdede
     print("initializing oooooooo")
     if session_playdede is None:
         print("Bootstrapping app")
