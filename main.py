@@ -155,18 +155,19 @@ def doSearch():
 
     # Ensure the search_value is provided
     if not search_value:
-        return jsonify({"error": "No search value provided"}), 400
+        return "no search_value"
     
     # Encode the search_value to be URL-safe
     #encoded_search_value = map_string(quote(search_value))
-    print("This is a message to the console, ", search_value)
+    print("This is a message to the console ------- 1 ", search_value)
     
     response = session_playdede.get(f"https://playdede.eu/search?s={search_value}")
-    print("This is a message to the console response response response, ", response)
+    print("This is a message to the console ------ 2 ", response)
 
     # Fetch the profile page content
     content = response.text
     print("contentcontentcontentcontent",content)
+    return content
 
     # Parse HTML content with BeautifulSoup
     soup = BeautifulSoup(content, 'lxml')
