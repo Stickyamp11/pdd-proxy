@@ -90,6 +90,10 @@ payload = {
     '_method': "auth/login"
 }
 
+headers_scraper = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36'
+}
+
 @app.after_request
 def after_request(response):
     # Optionally log the response details
@@ -153,6 +157,7 @@ def login_page():
 @requires_login
 def doSearch():
     global session_playdede
+    global headers_scraper
     search_value = request.form.get('searchValue')
     print("This is a message to the console, ", search_value)
 
@@ -165,7 +170,7 @@ def doSearch():
     print("This is a message to the console ------- 1 ", search_value)
     print("This is a message to the console session ------- 1.1 ", session_playdede)
 
-    response = session_playdede.get(f"https://playdede.eu/search?s={search_value}")
+    response = session_playdede.get(f"https://playdede.eu/search?s={search_value}", headers=headers_scraper)
     print("This is a message to the console ------ 2 ", response)
     return "2222 " + str(response.status_code) + str(response.text) 
     #return response.status_code
@@ -199,6 +204,7 @@ def map_string(input_string):
 @requires_login
 def getItem(param):
     global session_playdede
+    global headers_scraper
     search_value = param
     print("This is a message to the console, ", search_value)
 
@@ -207,7 +213,7 @@ def getItem(param):
     
     print("This is a message to the console, ", search_value)
     
-    response = session_playdede.get(f"https://playdede.eu/pelicula/{search_value}")
+    response = session_playdede.get(f"https://playdede.eu/pelicula/{search_value}", headers=headers_scraper)
     content = response.text
     soup = BeautifulSoup(content, 'lxml')
     important_element = soup.find(class_='linkSorter')
@@ -247,6 +253,7 @@ def getItem(param):
 @requires_login
 def getShowEpisode(param):
     global session_playdede
+    global headers_scraper
     search_value = param
     print("This is a message to the console, ", search_value)
 
@@ -255,7 +262,7 @@ def getShowEpisode(param):
     
     print("This is a message to the console, ", search_value)
     
-    response = session_playdede.get(f"https://playdede.eu/episodios/{search_value}")
+    response = session_playdede.get(f"https://playdede.eu/episodios/{search_value}", headers=headers_scraper)
     content = response.text
     soup = BeautifulSoup(content, 'lxml')
     important_element = soup.find(class_='linkSorter')
@@ -295,13 +302,14 @@ def getShowEpisode(param):
 @requires_login
 def searchShow(serieTxt):
     global session_playdede
+    global headers_scraper
     search_value = serieTxt
     print("This is a message to the console, ", search_value)
 
     if not search_value:
         return jsonify({"error": "No search value provided"}), 400
         
-    response = session_playdede.get(f"https://playdede.eu/serie/{search_value}")
+    response = session_playdede.get(f"https://playdede.eu/serie/{search_value}", headers=headers_scraper)
     content = response.text
     soup = BeautifulSoup(content, 'lxml')
     
