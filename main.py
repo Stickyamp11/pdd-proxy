@@ -166,12 +166,12 @@ def doSearch():
         response = session_playdede.get(f"https://playdede.eu/search?s={search_value}")
         # Fetch the profile page content
         content = response.text
-
+        return response;
         # Parse HTML content with BeautifulSoup
         soup = BeautifulSoup(content, 'lxml')
         
         # Find the element with the class name 'importantElement'
-        important_element = soup.find(id=' archive-content')
+        important_element = soup.find(id='archive-content')
         
         # Extract the HTML of the important element
         if important_element:
