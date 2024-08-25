@@ -337,7 +337,7 @@ def searchShow(serieTxt):
 #def selectMovieItem():
 @app.route('/cdn-cgi/challenge-platform/h/b/orchestrate/chl_page/v1', methods=['GET'])
 def proxyRequestToCloudFlare():
-    return session_playdede.get(f"https://playdede.eu/cdn-cgi/challenge-platform/h/b/orchestrate/chl_page/v1")
+    return str(session_playdede.get(f"https://playdede.eu/cdn-cgi/challenge-platform/h/b/orchestrate/chl_page/v1"))
 
 
 def initializeSession():
