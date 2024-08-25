@@ -4,7 +4,11 @@ import re
 from bs4 import BeautifulSoup
 from flask import Flask, redirect, render_template_string, request, jsonify, make_response, url_for
 import requests
+import cloudscraper
 
+
+session_playdede = None
+#scraper = cloudscraper.create_scraper()  # returns a CloudScraper instance
 API_KEY = "SECRET_APIKEY_CATS"
 DEFAULT_EMPTY_RESPONSE = '''
     <div><span>Not found. No results.</span></div>
@@ -85,9 +89,6 @@ payload = {
     'pass': "123456",
     '_method': "auth/login"
 }
-
-session_playdede = None
-
 
 @app.after_request
 def after_request(response):
@@ -341,7 +342,8 @@ def initializeSession():
     if session_playdede is None:
         print("Bootstrapping app")
         # Create a session object
-        session_playdede = requests.Session()
+        #session_playdede = requests.Session()
+        session_playdede = cloudscraper.create_scraper()
         # Post the payload to the login page
         response = session_playdede.post(login_url, data=payload)
         print(f"session_playdede.post(login_url, data=payload): {response.status_code}")
