@@ -151,33 +151,37 @@ def login_page():
 @app.route('/doSearch', methods=['POST'])
 @requires_login
 def doSearch():
-    search_value = request.form.get('searchValue')
-    print("This is a message to the console, ", search_value)
+    try:
+        search_value = request.form.get('searchValue')
+        print("This is a message to the console, ", search_value)
 
-    # Ensure the search_value is provided
-    if not search_value:
-        return jsonify({"error": "No search value provided"}), 400
-    
-    # Encode the search_value to be URL-safe
-    #encoded_search_value = map_string(quote(search_value))
-    print("This is a message to the console, ", search_value)
-    
-    response = session_playdede.get(f"https://playdede.eu/search?s={search_value}")
-    # Fetch the profile page content
-    content = response.text
+        # Ensure the search_value is provided
+        if not search_value:
+            return jsonify({"error": "No search value provided"}), 400
+        
+        # Encode the search_value to be URL-safe
+        #encoded_search_value = map_string(quote(search_value))
+        print("This is a message to the console, ", search_value)
+        
+        response = session_playdede.get(f"https://playdede.eu/search?s={search_value}")
+        # Fetch the profile page content
+        content = response.text
 
-     # Parse HTML content with BeautifulSoup
-    soup = BeautifulSoup(content, 'lxml')
-    
-    # Find the element with the class name 'importantElement'
-    important_element = soup.find(id=' archive-content')
-    
-    # Extract the HTML of the important element
-    if important_element:
-       return DEFAULT_SEARCH_UI + str(important_element)
-    #else:
-    #    filtered_content = '<p>No important element found.</p>'
-    return None
+        # Parse HTML content with BeautifulSoup
+        soup = BeautifulSoup(content, 'lxml')
+        
+        # Find the element with the class name 'importantElement'
+        important_element = soup.find(id=' archive-content')
+        
+        # Extract the HTML of the important element
+        if important_element:
+            return DEFAULT_SEARCH_UI + str(important_element)
+        #else:
+        #    filtered_content = '<p>No important element found.</p>'
+        return DEFAULT_SEARCH_UI + DEFAULT_EMPTY_RESPONSE
+    except:
+        return "F"
+
 
 def map_string(input_string):
     return input_string.replace(' ', '+')
