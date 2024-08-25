@@ -166,7 +166,7 @@ def doSearch():
         response = session_playdede.get(f"https://playdede.eu/search?s={search_value}")
         # Fetch the profile page content
         content = response.text
-        return response;
+        return str(response);
         # Parse HTML content with BeautifulSoup
         soup = BeautifulSoup(content, 'lxml')
         
