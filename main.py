@@ -90,14 +90,14 @@ session_playdede = requests.Session()
 session_playdede.post(login_url, data=payload)
 
 def requires_login(f):
-    def wrapper(*args, **kwargs):
+    def wrapper_login(*args, **kwargs):
         # Check if session cookies are present
         cookies = request.cookies
         # Here you can check specific cookies if needed
         if not cookies or 'pdd_proxy_session' not in cookies:  # Replace 'session_cookie_name' with your actual session cookie name
             return redirect(url_for('login_page'))  # Redirect to the login page
         return f(*args, **kwargs)
-    return wrapper
+    return wrapper_login
 
 @app.route('/')
 @requires_login
