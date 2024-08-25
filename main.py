@@ -90,6 +90,12 @@ session_playdede = requests.Session()
 # Post the payload to the login page
 session_playdede.post(login_url, data=payload)
 
+@app.after_request
+def after_request(response):
+    # Optionally log the response details
+    app.logger.info(f"Response: {response}")
+    return response
+
 def requires_login(f):
     @wraps(f)
     def wrapper_login(*args, **kwargs):
