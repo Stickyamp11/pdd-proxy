@@ -36,7 +36,7 @@ XPATH_LOGIN_SUBMIT = "*//form[@action='auth/login']/div/button[2]";
 
 
 #CREATING THE GLOBAL SELENIUM DRIVER INSTANCE
-driver = Driver(uc=True, headless=True)
+driver = Driver(uc=False, headless=True)
 
 #driver = webdriver.Chrome(options=chrome_options)
 driver.implicitly_wait(5)  # seconds
