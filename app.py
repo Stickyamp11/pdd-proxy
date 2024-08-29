@@ -39,6 +39,7 @@ def getInitialLoginCookies():
     # Step 1: Set up the WebDriver and log in to the website
     #driver = webdriver.Chrome(options=chrome_options)
     global driver
+    print(ATTACK_URL,"aaaaa")
     driver.get(f"{ATTACK_URL}/login")
     driver.implicitly_wait(5)  # seconds
 
@@ -411,5 +412,5 @@ def searchShow(serieTxt):
 if __name__ == '__main__':
     getInitialLoginCookies();
     waitSeconds(1);
-    app.run(debug=True)
+    app.run(debug=True, port=8000)
 
