@@ -412,5 +412,5 @@ def searchShow(serieTxt):
 if __name__ == '__main__':
     getInitialLoginCookies();
     waitSeconds(1);
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0', port=10000)
 
