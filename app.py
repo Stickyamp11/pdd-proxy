@@ -43,6 +43,7 @@ def getInitialLoginCookies():
     print(ATTACK_URL,"aaaaa")
     driver.get(f"{ATTACK_URL}/login")
     waitSeconds(10);
+    print(driver.page_source)
 
     username = driver.find_element(By.XPATH, XPATH_LOGIN_USER)
     waitSeconds(3);
