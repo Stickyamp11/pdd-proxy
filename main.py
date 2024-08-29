@@ -1,14 +1,114 @@
 from functools import wraps
 from pipes import quote
 import re
+import time
 from bs4 import BeautifulSoup
-from flask import Flask, redirect, render_template_string, request, jsonify, make_response, url_for
-import requests
-import cloudscraper
+from flask import Flask, app, redirect, render_template_string, request, jsonify, make_response, url_for
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+
+import pickle
+
+ATTACK_URL = "https://playdede.eu"
+
+#SELENIUM PART
+
+# Prevent downloads by setting an unwritable download directory
+prefs = {
+    "download.prompt_for_download": False,  # Disable the prompt to download
+    "download.directory_upgrade": True,     # Enable directory upgrade (even though it's unwritable)
+    "download.default_directory": "/dev/null",  # Set to a non-writable directory
+    "download_restrictions": 3,             # Disallow all downloads
+}
+
+chrome_options = Options()
+chrome_options.add_experimental_option("prefs", prefs)
+chrome_options.add_argument("--headless")
+
+# xpaths:
+XPATH_LOGIN_USER = "*//form[@action='auth/login']/input[@name='user']";
+XPATH_LOGIN_PASS = "*//form[@action='auth/login']/input[@name='pass']";
+XPATH_LOGIN_SUBMIT = "*//form[@action='auth/login']/div/button[2]";
 
 
-session_playdede = None
-#scraper = cloudscraper.create_scraper()  # returns a CloudScraper instance
+#CREATING THE GLOBAL SELENIUM DRIVER INSTANCE
+driver = webdriver.Chrome(options=chrome_options)
+
+def getInitialLoginCookies():
+    # Step 1: Set up the WebDriver and log in to the website
+    #driver = webdriver.Chrome(options=chrome_options)
+    global driver
+    driver.get(f"{ATTACK_URL}/login")
+    driver.implicitly_wait(5)  # seconds
+
+    username = driver.find_element(By.XPATH, XPATH_LOGIN_USER)
+    waitSeconds(1);
+    password = driver.find_element(By.XPATH, XPATH_LOGIN_PASS)
+    waitSeconds(1);
+    submitButton = driver.find_element(By.XPATH, XPATH_LOGIN_SUBMIT)
+    #closeUnwantedTabsTick(driver,"playdede");
+    waitSeconds(1);
+    username.send_keys("scrapeme123")
+    waitSeconds(1);
+    password.send_keys("123456")
+    waitSeconds(1);
+    clickWithPreventAds(submitButton,driver)
+    # Step 2: Save the cookies to a file
+    waitSeconds(1);
+    cookies = driver.get_cookies()
+    with open("cookies.pkl", "wb") as file:
+        pickle.dump(cookies, file)
+
+    waitSeconds(1);
+    html_source = driver.page_source
+
+    #driver.quit()
+
+def waitSeconds(seconds):
+    time.sleep(seconds)
+
+def closeUnwantedTabsTick(driver, match_str = "playdede"):
+    current_tabs = driver.window_handles
+    for tab in current_tabs:
+        driver.switch_to.window(tab)  # Switch to the tab
+        current_url = driver.current_url
+        print(current_url, "current")
+        if match_str not in current_url:
+            driver.close()
+    remaining_tabs = driver.window_handles
+    if remaining_tabs:
+        driver.switch_to.window(remaining_tabs[0])
+
+def clickWithPreventAds(element, driver):
+    element.click()
+    waitSeconds(1)
+    #closeUnwantedTabsTick(driver)
+
+def initializeCookiesInDriver():
+    global driver
+    driver.get(ATTACK_URL)
+    # Load cookies from the file
+    with open("cookies.pkl", "rb") as file:
+        cookies = pickle.load(file)
+
+    # Add each cookie to the browser
+    for cookie in cookies:
+        driver.add_cookie(cookie)
+
+
+def callPlaydedeWithCookies(url):
+    #driver = webdriver.Chrome(options=chrome_options)
+    global driver
+    driver.get(url)
+    waitSeconds(1)
+    html_source = driver.page_source
+    #driver.quit()
+    return html_source;
+
+
+
+# START OF THE FLASK PART
 API_KEY = "SECRET_APIKEY_CATS"
 DEFAULT_EMPTY_RESPONSE = '''
     <div><span>Not found. No results.</span></div>
@@ -79,21 +179,6 @@ DEFAULT_SEARCH_UI = '''
 
 app = Flask(__name__, static_folder='public')
 
-
-# URL of the login page
-login_url = 'https://playdede.eu/ajax.php'
-
-# Payload with login credentials
-payload = {
-    'user': "scrapeme123",
-    'pass': "123456",
-    '_method': "auth/login"
-}
-
-headers_scraper = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36'
-}
-
 @app.after_request
 def after_request(response):
     # Optionally log the response details
@@ -114,7 +199,6 @@ def requires_login(f):
 @app.route('/')
 @requires_login
 def home():
-    initializeSession();
     return DEFAULT_SEARCH_UI;
 
 # Function to create a session with a dummy key and return the session cookie
@@ -156,30 +240,18 @@ def login_page():
 @app.route('/doSearch', methods=['POST'])
 @requires_login
 def doSearch():
-    global session_playdede
-    global headers_scraper
     search_value = request.form.get('searchValue')
     print("This is a message to the console, ", search_value)
 
-    # Ensure the search_value is provided
     if not search_value:
         return "no search_value"
     
-    # Encode the search_value to be URL-safe
-    #encoded_search_value = map_string(quote(search_value))
-    print("This is a message to the console ------- 1 ", search_value)
-    print("This is a message to the console session ------- 1.1 ", session_playdede)
-
-    response = session_playdede.get(f"https://playdede.eu/search?s={search_value}", headers=headers_scraper)
-    print("This is a message to the console ------ 2 ", response)
-    return "2222 " + str(response.status_code) + str(response.text) 
-    #return response.status_code
+    url_to_call = f"{ATTACK_URL}/search?s={search_value}";
+    print(url_to_call,"url")
+    response = callPlaydedeWithCookies(url_to_call);
 
     # Fetch the profile page content
-    content = response.text
-    print("contentcontentcontentcontent",content)
-    return content
-
+    content = response
     # Parse HTML content with BeautifulSoup
     soup = BeautifulSoup(content, 'lxml')
 
@@ -203,18 +275,14 @@ def map_string(input_string):
 @app.route('/pelicula/<param>', methods=['GET'])
 @requires_login
 def getItem(param):
-    global session_playdede
-    global headers_scraper
     search_value = param
     print("This is a message to the console, ", search_value)
 
     if not search_value:
         return jsonify({"error": "No search value provided"}), 400
-    
-    print("This is a message to the console, ", search_value)
-    
-    response = session_playdede.get(f"https://playdede.eu/pelicula/{search_value}", headers=headers_scraper)
-    content = response.text
+        
+    response = callPlaydedeWithCookies(f"{ATTACK_URL}/pelicula/{search_value}")
+    content = response
     soup = BeautifulSoup(content, 'lxml')
     important_element = soup.find(class_='linkSorter')
     
@@ -252,8 +320,6 @@ def getItem(param):
 @app.route('/episodios/<param>/', methods=['GET'])
 @requires_login
 def getShowEpisode(param):
-    global session_playdede
-    global headers_scraper
     search_value = param
     print("This is a message to the console, ", search_value)
 
@@ -262,8 +328,8 @@ def getShowEpisode(param):
     
     print("This is a message to the console, ", search_value)
     
-    response = session_playdede.get(f"https://playdede.eu/episodios/{search_value}", headers=headers_scraper)
-    content = response.text
+    response = callPlaydedeWithCookies(f"{ATTACK_URL}/episodios/{search_value}")
+    content = response
     soup = BeautifulSoup(content, 'lxml')
     important_element = soup.find(class_='linkSorter')
     
@@ -301,16 +367,14 @@ def getShowEpisode(param):
 @app.route('/serie/<serieTxt>', methods=['GET'])
 @requires_login
 def searchShow(serieTxt):
-    global session_playdede
-    global headers_scraper
     search_value = serieTxt
     print("This is a message to the console, ", search_value)
 
     if not search_value:
         return jsonify({"error": "No search value provided"}), 400
         
-    response = session_playdede.get(f"https://playdede.eu/serie/{search_value}", headers=headers_scraper)
-    content = response.text
+    response = callPlaydedeWithCookies(f"{ATTACK_URL}/serie/{search_value}")
+    content = response
     soup = BeautifulSoup(content, 'lxml')
     
     # Find all <a> tags with href starting with "/episodios"
@@ -344,25 +408,8 @@ def searchShow(serieTxt):
     #else:
     return redirect('/')
 
-#def selectMovieItem():
-@app.route('/cdn-cgi/challenge-platform/h/b/orchestrate/chl_page/v1', methods=['GET'])
-def proxyRequestToCloudFlare():
-    return str(session_playdede.get(f"https://playdede.eu/cdn-cgi/challenge-platform/h/b/orchestrate/chl_page/v1").text)
-
-
-def initializeSession():
-    global session_playdede
-    print("initializing oooooooo")
-    if session_playdede is None:
-        print("Bootstrapping app")
-        # Create a session object
-        #session_playdede = requests.Session()
-        session_playdede = cloudscraper.create_scraper()
-        # Post the payload to the login page
-        response = session_playdede.post(login_url, data=payload)
-        print(f"session_playdede.post(login_url, data=payload): {response.status_code}")
-        print(f"session_playdede.post(login_url, data=payload): {response.text}")
-        print(f"session_playdede.post(login_url, data=payload): {response}")
-
 if __name__ == '__main__':
+    getInitialLoginCookies();
+    waitSeconds(1);
     app.run(debug=True)
+
