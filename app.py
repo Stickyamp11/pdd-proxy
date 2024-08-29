@@ -419,7 +419,7 @@ def searchShow(serieTxt):
 def installGoogleChrome():
     # Define the URL for the latest stable Chrome version
     chrome_exe_url = "https://dl.google.com/chrome/install/latest/chrome_installer.exe"
-    download_path = "C:\\path\\to\\download\\chrome_installer.exe"
+    download_path = ".\chrome_installer.exe"
 
     # Download the Chrome installer
     response = requests.get(chrome_exe_url)
