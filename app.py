@@ -7,6 +7,7 @@ from flask import Flask, app, redirect, render_template_string, request, jsonify
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from seleniumbase import Driver
 
 import pickle
 
@@ -33,7 +34,9 @@ XPATH_LOGIN_SUBMIT = "*//form[@action='auth/login']/div/button[2]";
 
 
 #CREATING THE GLOBAL SELENIUM DRIVER INSTANCE
-driver = webdriver.Chrome(options=chrome_options)
+driver = Driver(uc=True, headless=True)
+
+#driver = webdriver.Chrome(options=chrome_options)
 driver.implicitly_wait(5)  # seconds
 
 def getInitialLoginCookies():
@@ -42,7 +45,7 @@ def getInitialLoginCookies():
     global driver
     print(ATTACK_URL,"aaaaa")
     driver.get(f"{ATTACK_URL}/login")
-    waitSeconds(10);
+    waitSeconds(5);
     print(driver.page_source)
 
     username = driver.find_element(By.XPATH, XPATH_LOGIN_USER)
