@@ -416,28 +416,9 @@ def searchShow(serieTxt):
     #else:
     return redirect('/')
 
-def installGoogleChrome():
-    # Define the URL for the latest stable Chrome version
-    chrome_exe_url = "https://dl.google.com/chrome/install/latest/chrome_installer.exe"
-    download_path = "chrome_installer.exe"
-
-    # Download the Chrome installer
-    response = requests.get(chrome_exe_url)
-    with open(download_path, 'wb') as file:
-        file.write(response.content)
-
-    print("Downloaded Google Chrome installer.")
-
-    # Run the installer
-    subprocess.run([download_path, '/silent', '/install'], check=True)
-    waitSeconds(30)
-    print("Installed Google Chrome.")
-
-
-
 
 if __name__ == '__main__':
-    installGoogleChrome();
+    #installGoogleChrome();
     getInitialLoginCookies();
     waitSeconds(1);
     app.run(debug=True, host='0.0.0.0', port=10000)
