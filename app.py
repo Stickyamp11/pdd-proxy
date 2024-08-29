@@ -34,6 +34,7 @@ XPATH_LOGIN_SUBMIT = "*//form[@action='auth/login']/div/button[2]";
 
 #CREATING THE GLOBAL SELENIUM DRIVER INSTANCE
 driver = webdriver.Chrome(options=chrome_options)
+driver.implicitly_wait(5)  # seconds
 
 def getInitialLoginCookies():
     # Step 1: Set up the WebDriver and log in to the website
@@ -41,19 +42,19 @@ def getInitialLoginCookies():
     global driver
     print(ATTACK_URL,"aaaaa")
     driver.get(f"{ATTACK_URL}/login")
-    driver.implicitly_wait(5)  # seconds
+    waitSeconds(10);
 
     username = driver.find_element(By.XPATH, XPATH_LOGIN_USER)
-    waitSeconds(1);
+    waitSeconds(3);
     password = driver.find_element(By.XPATH, XPATH_LOGIN_PASS)
-    waitSeconds(1);
+    waitSeconds(3);
     submitButton = driver.find_element(By.XPATH, XPATH_LOGIN_SUBMIT)
     #closeUnwantedTabsTick(driver,"playdede");
-    waitSeconds(1);
+    waitSeconds(3);
     username.send_keys("scrapeme123")
-    waitSeconds(1);
+    waitSeconds(3);
     password.send_keys("123456")
-    waitSeconds(1);
+    waitSeconds(3);
     clickWithPreventAds(submitButton,driver)
     # Step 2: Save the cookies to a file
     waitSeconds(1);
